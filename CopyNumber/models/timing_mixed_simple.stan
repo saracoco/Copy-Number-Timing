@@ -52,13 +52,12 @@ model {
   //alpha ~
   phi ~ dirichlet(rep_vector(1.0, K));;
   kappa ~ normal(5,2.5);
-  // phi = expected value of w, kappa (minus K) = concentrazione della distribuzione (o forza del prior), strength of the prior mean measured in number of prior observations.
+  // phi = expected value of w, kappa (minus K) = concentrazione della distribuzione / strength of the prior mean measured in number of prior observations.
 
   for (s in 1:S){
       w[s] ~ dirichlet(alpha);
   }
   tau ~ beta(2,2);
-  //tau ~ uniform(0,1);  //as it is more difficult to separete events in the late/early period we could try to favour the priors on late or early periods ?
 
 
 
