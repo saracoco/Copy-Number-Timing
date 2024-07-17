@@ -7,17 +7,17 @@ library(cmdstanr)
 library(factoextra)
 library(ppclust)
 
-setwd("C:/Users/sarac/OneDrive/Documenti/DOCUMENTI/DESKTOP/0_TRIESTE_STAT/0_TRIESTE/CDS/progetto")
+setwd("C:/Users/sarac/CDS/CopyNumber")
 source("./CNTiming/R/simulate_functions.R")
 source("./CNTiming/R/fitting_functions.R")
 source("./CNTiming/R/plotting_functions.R")
 
 
-number_events=2
+number_events=6
 vector_tau<-c(0.01,0.9)
-vector_karyo<-c("2:0")
+vector_karyo<-c("2:0", "2:1")
 weignths_tau<-c(0.5,0.5) #vedere se il modello ha trovato le giuste proporzioni --> comp tau proportions
-weights_karyo<-c(1)
+weights_karyo<-c(0.5,0.5)
 
 data <- get_taus_karyo(number_events,vector_tau,vector_karyo,weignths_tau,weights_karyo)
 all_sim = get_simulation(data$taus,data$karyo, purity=.99)
@@ -73,16 +73,17 @@ inits_chain1 <- get_init(tau_single_inference, K)
 fit_result <- fit_variational(input_data, max_attempts = 10, initialization = inits_chain1, INIT = TRUE, initial_iter = 10000)
 
 # directly
-results <- fit_model_selection_best_K(data_sim, data$karyo, purity)
+results <- fit_model_selection_best_K(data_sim, data$karyo, purity, INIT = FALSE)
 
 
 
 results$model_selection_tibble
-plotting(results$res_best_K,results$input_data,results$best_K)
-ggsave("./plots/plot_inferenc_best_K.png", width = 12, height = 16, device = "png")
+plot_best_K <- plotting(results$res_best_K,results$input_data,results$best_K)
+ggsave("./plots/plot_inferenc_best_K.png", width = 12, height = 16, device = "png", plot = plot_best_K)
 
 
 #change by plotting the total number of parameters
-p<-plot(results$model_selection_tibble$K, results$model_selection_tibble$BIC)
-p<-plot(results$model_selection_tibble$K, results$model_selection_tibble$Log_lik)
+plot(results$model_selection_tibble$K, results$model_selection_tibble$BIC)
+plot(results$model_selection_tibble$K, results$model_selection_tibble$Log_lik)
+ggsave("./plots/score_number_parameters.png", width = 12, height = 16, device = "png")
 

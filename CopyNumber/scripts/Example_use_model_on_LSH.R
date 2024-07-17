@@ -29,8 +29,8 @@ UPN05_alpha_beta_NV = UPN05_alpha_beta %>% filter(timing_classification %in% c("
 
 data_lsh <- list(UPN04 = UPN04_extra_NV, UPN05 = UPN05_extra_NV, UPN04_LSH = UPN04_alpha_beta_NV, UPN05_LSH = UPN05_alpha_beta_NV)
 #names <- c("UPN04","UPN04_LSH", "UPN05", "UPN05_LSH")
-#names <- c("UPN04","UPN04_LSH")
-names <- c("UPN04", "UPN04_LSH")
+names <- c("UPN04","UPN04_LSH")
+#names <- c("UPN05", "UPN05_LSH")
 
 
 
@@ -64,17 +64,19 @@ results$model_selection_tibble
 p <- plotting(results$res_best_K,results$input_data,results$best_K)
 p
 
+ggsave(paste0("./plots/plot_best_K_",names[1],".png"), width = 12, height = 16, device = "png", plot=p)
 
 
 
-#### INFERENCE FO A SINGLE k ##################################################################################
 
+
+#### INFERENCE FOR A SINGLE k ##################################################################################
 
 input_data_1 <- prepare_input_data(data, karyo_all, K=1, purity=0.98)
 res_1 <- fit_variational(input_data_1, max_attempts = 10, initialization = inits_chain1, INIT = FALSE, initial_iter = 10000)
 
 p_1 <- plotting(res_1,input_data_1,1)
-ggsave(paste0("./plots/plot_inference",names[1],"_1.png"), width = 12, height = 16, device = "png", plot=p)
+ggsave(paste0("./plots/plot_inference",names[1],"_1.png"), width = 12, height = 16, device = "png", plot=p_1)
 
 
 
@@ -82,7 +84,17 @@ input_data_2 <- prepare_input_data(data, karyo_all, K=2, purity=0.98)
 res_2 <- fit_variational(input_data_2, max_attempts = 10, initialization = inits_chain1, INIT = FALSE, initial_iter = 10000)
 
 p_2 <- plotting(res_2,input_data_2,2)
-ggsave(paste0("./plots/plot_inference",names[2],"_2.png"), width = 12, height = 16, device = "png", plot=p)
+ggsave(paste0("./plots/plot_inference",names[1],"_2.png"), width = 12, height = 16, device = "png", plot=p_2)
 
 
 
+
+
+
+
+accepted_mutations_04 <- readRDS("./results/accepted_mutations_04.rds")
+accepted_mutations_05 <- readRDS("./results/accepted_mutations_05.rds")
+
+
+hist(accepted_mutations_04$NV/accepted_mutations_04$DP, breaks = 15)
+hist(accepted_mutations_05$NV/accepted_mutations_05$DP, breaks = 20)
