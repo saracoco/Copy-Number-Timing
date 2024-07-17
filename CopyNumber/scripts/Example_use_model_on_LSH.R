@@ -98,3 +98,42 @@ accepted_mutations_05 <- readRDS("./results/accepted_mutations_05.rds")
 
 hist(accepted_mutations_04$NV/accepted_mutations_04$DP, breaks = 15)
 hist(accepted_mutations_05$NV/accepted_mutations_05$DP, breaks = 20)
+
+
+hist_data_extra <- as.data.frame(data["UPN04"]$UPN04) %>% 
+  ggplot(mapping = aes(x=(NV.REL/DP.REL),  fill = timing_classification)) +
+  scale_color_manual(values = c("black"))+
+  scale_fill_manual(values = c("red4","firebrick1"))+
+  geom_histogram(binwidth=0.01, alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1) +
+  ggtitle( "UPN04", data["UPN04"]$UPN04$segment.REL)
+
+
+hist_data_LSH <- as.data.frame(data["UPN04_LSH"]$UPN04_LSH) %>% 
+  ggplot(mapping = aes(x=(NV.REL/DP.REL), fill=timing_classification)) +
+  scale_color_manual(values = c("black"))+
+  scale_fill_manual(values = c("mediumblue","deepskyblue"))+
+  geom_histogram(binwidth=0.01, alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1) +
+  ggtitle("UPN04_LSH", data["UPN04_LSH"]$UPN04$segment.REL)
+
+
+p_istogram <- fit_extra_alpha_beta$inference_results %>% filter(segment_name == "UPN04" | segment_name == "UPN04_LSH") %>%
+  ggplot(mapping = aes(x=tau, fill=segment_name)) +
+  scale_fill_manual(values = c("mediumblue","red4"))+
+  geom_histogram(binwidth=0.02, alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1) 
+
+
+plot_inference_04 <- (p_istogram + (hist_data_extra / hist_data_LSH)) + 
+  plot_layout(widths = c(6), heights = c(10)) +
+  plot_annotation(
+    title = 'UPN04 LSH and extra event ',
+    subtitle = "Extra event is on chr ",
+    caption = "caption"
+  ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
+plot_inference_04
+
