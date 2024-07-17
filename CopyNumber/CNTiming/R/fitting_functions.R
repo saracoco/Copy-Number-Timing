@@ -128,7 +128,7 @@ get_init = function(data, K, phi=c(), kappa=5){
 
 
 
-#' fit_model_selection Function
+#' fit_model_selection_best_K Function
 #'
 #' being able to perform model selection on already simulated data or real data and add initialization to the inference 
 #' @param all_sim data
@@ -203,7 +203,7 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
   }
 
 
-   best_K <- model_selection_tibble %>% dplyr::filter(BIC == min(BIC)) %>% pull(K)
+   best_K <- model_selection_tibble %>% dplyr::filter(LOO == min(LOO)) %>% pull(K)
    input_data <- prepare_input_data(all_sim, karyo, best_K, purity)
    
    if (INIT==TRUE){
