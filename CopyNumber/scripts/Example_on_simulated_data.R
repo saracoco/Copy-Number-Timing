@@ -42,9 +42,9 @@ ggsave("./plots/data.png", plot=plot_data, width = 12, height = 10, device = "pn
 
 # fit with a specific number of K 
 input_data_1 <- prepare_input_data(data_sim, data$karyo, K=1, purity=0.99)
-res_1 <- fit_variational(input_data, max_attempts = 10, initialization = inits_chain1, INIT = FALSE, initial_iter = 10000)
+res_1 <- fit_variational(input_data_1, max_attempts = 10, initialization = inits_chain1, INIT = FALSE, initial_iter = 10000)
 
-p_1 <- plotting(res,input_data,1)
+p_1 <- plotting(res_1,input_data_1,1)
 
 
 

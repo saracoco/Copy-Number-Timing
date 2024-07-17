@@ -360,18 +360,56 @@ peaks_inference = function(karyo, purity){
 #' prepare_input_data()
 
 prepare_input_data = function(all_sim, karyo, K, purity){
+  
+  peaks = peaks_inference(karyo,purity)
+  alpha = 0.05
+  min_mutations_number = 2
+  accepted_mutations <- data.frame()
+  
+  if (nrow(all_sim) > 0) {
+    # Check if mutation is inside CI
+    probs <- c(alpha/2, 1 - alpha/2)
+    
+    DP <- all_sim$DP
+    NV <- all_sim$NV
+    
+    
+    accepted_idx <- lapply(1:length(DP), function(i) {
+      for (p in peaks) {
+       
+          quantiles <- qbinom(probs, DP[i], p)
+        
+        if ((NV[i] >= quantiles[1]) && (NV[i] <= quantiles[2])) {
+          return(i)
+        }
+      }
+    }) %>% unlist()
+    
+    # Get only good mutations
+    accepted_mutations <- data.frame(DP = DP[accepted_idx], NV = NV[accepted_idx], segment_id=all_sim$j[accepted_idx])
+    
+  }
+  
+  counts <- table(accepted_mutations$segment_id)
+  minimum_number_per_segment <- all(counts >= min_mutations_number)
+  
+  if (minimum_number_per_segment == TRUE) {
+  
   input_data <- list(
-    S = length(unique(all_sim$j)),
+    S = length(unique(all_sim$j[accepted_idx])),
     K = K,
-    N = nrow(all_sim),
+    N = nrow(accepted_mutations),
     karyotype = lapply(karyo, karyo_to_int) %>% unlist(),
-    seg_assignment = all_sim$segment_id,
+    seg_assignment = all_sim$segment_id[accepted_idx],
     peaks = peaks_inference(karyo,purity),
-    NV = all_sim$NV,
-    DP = all_sim$DP
+    NV = NV[accepted_idx],
+    DP = DP[accepted_idx]
   )
+  
+  saveRDS(accepted_mutations, paste0("results/accepted_mutations.rds"))
 
   return(input_data)
+} 
 }
 
 
