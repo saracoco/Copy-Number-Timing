@@ -198,21 +198,32 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
 
     model_selection_tibble <- dplyr::bind_rows(model_selection_tibble, dplyr::tibble(K = K, BIC = BIC, AIC = AIC, LOO = loo_value, Log_lik = L))
     
-    saveRDS(res, paste0("results/res",K,".rds"))
-    saveRDS(input_data, paste0("results/input_data",K,".rds"))
+    saveRDS(res, paste0("results/res",K,"_",all_sim$j[1],".rds"))
+    saveRDS(input_data, paste0("results/input_data_",all_sim$j[1],"_",K,".rds"))
+    
+    p <- plotting(res,input_data,K)
+    ggsave(paste0("./plots/plot_inference_",all_sim$j[1],"_",K,".png"), width = 12, height = 16, device = "png", plot=p)
+    
   }
 
-
+   loo_plot <-  plot(model_selection_tibble$K, model_selection_tibble$LOO)
+   ggsave(paste0("./plots/plot_loo_",all_sim$j[1],".png"), width = 5, height = 4, device = "png", plot=loo_plot)
+   
+  
    best_K <- model_selection_tibble %>% dplyr::filter(LOO == min(LOO)) %>% pull(K)
    input_data <- prepare_input_data(all_sim, karyo, best_K, purity)
    
+    
    if (INIT==TRUE){
      inits_chain <- get_init(tau_single_inference, best_K)
      res <- fit_variational(input_data, max_attempts=max_attempts, initialization = inits_chain, INIT=TRUE)
    } else {
      res <- fit_variational(input_data, max_attempts=max_attempts, INIT=FALSE)
    }
-
+   
+   p_best_K <- plotting(res,input_data,best_K)
+   ggsave(paste0("./plots/plot_inference_",all_sim$j[1],"_",best_K,".png"), width = 12, height = 16, device = "png", plot=p_best_K)
+   
   return(list(all_sim = all_sim, model_selection_tibble = model_selection_tibble, res_best_K=res, best_K=best_K, input_data=input_data
 ))
 

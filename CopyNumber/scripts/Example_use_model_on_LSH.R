@@ -29,8 +29,8 @@ UPN05_alpha_beta_NV = UPN05_alpha_beta %>% filter(timing_classification %in% c("
 
 data_lsh <- list(UPN04 = UPN04_extra_NV, UPN05 = UPN05_extra_NV, UPN04_LSH = UPN04_alpha_beta_NV, UPN05_LSH = UPN05_alpha_beta_NV)
 #names <- c("UPN04","UPN04_LSH", "UPN05", "UPN05_LSH")
-names <- c("UPN04","UPN04_LSH")
-#names <- c("UPN05", "UPN05_LSH")
+#names <- c("UPN04","UPN04_LSH")
+names <- c("UPN05", "UPN05_LSH")
 
 
 
@@ -61,10 +61,111 @@ for(i in 1:length(names)){
 results <- fit_model_selection_best_K(data, karyo=karyo_all, purity=0.98, INIT=FALSE)
 
 results$model_selection_tibble
-p <- plotting(results$res_best_K,results$input_data,results$best_K)
-p
 
-ggsave(paste0("./plots/plot_best_K_",names[1],".png"), width = 12, height = 16, device = "png", plot=p)
+# p <- plotting(results$res_best_K,results$input_data,results$best_K)
+# ggsave(paste0("./plots/plot_best_K_",names[1],".png"), width = 12, height = 16, device = "png", plot=p)
+# 
+
+
+
+##### SINGLE MODELS RESULTS #######################################################################################à
+
+#UPN04
+input_data_1 <- readRDS("./results/input_data1_UPN04.rds")
+input_data_2 <- readRDS("./results/input_data2_UPN04.rds")
+
+res_1 <- readRDS("./results/res1_UPN04.rds")
+res_2 <- readRDS("./results/res2_UPN04.rds")
+
+
+#UPN05
+input_data_1 <- readRDS("./results/input_data1_UPN05.rds")
+input_data_2 <- readRDS("./results/input_data2_UPN05.rds")
+
+res_1 <- readRDS("./results/res1_UPN05.rds")
+res_2 <- readRDS("./results/res2_UPN05.rds")
+
+#### Plot accepted mutations #########################################################################################
+
+
+accepted_mutations_UPN04 <- readRDS("./results/input_data1_UPN04.rds")
+accepted_mutations_UPN05 <- readRDS("./results/input_data1_UPN05.rds")
+
+
+#UPN04
+accepted_mutations_UPN04 <- as.data.frame(accepted_mutations_UPN04)
+df <- filter(accepted_mutations_UPN04, seg_assignment == 1)
+hist_data_extra <- df %>% 
+  ggplot(mapping = aes(x=(NV/DP))) +
+  geom_histogram(binwidth=0.01, , fill="blue", alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1) +
+  ylim(0, 5) +
+  ggtitle("UPN04 extra", data_lsh["UPN04_LSH"]$UPN04_LSH$segment.REL[1])
+
+
+df <- filter(accepted_mutations_UPN04, seg_assignment == 2)
+hist_data_LSH <- df %>% 
+  ggplot(mapping = aes(x=(NV/DP), fill=timing_classification)) +
+  geom_histogram(binwidth=0.01, , fill="blue", alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1) +
+  ylim(0, 5) +
+  ggtitle("UPN04 LSH", data_lsh["UPN04"]$UPN04$segment.REL[1])
+
+
+plot_mutations_04 <- (hist_data_extra + hist_data_LSH) + 
+  plot_layout(widths = c(6), heights = c(10)) +
+  plot_annotation(
+    title = 'Accepted mutations after inference on UPN04 LSH and UPN04 extra CN event ',
+    subtitle = " ", #Extra event is on chr
+    caption = "" #caption
+  ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
+plot_mutations_04
+
+ggsave(paste0("./plots/accepted_mutations_UPN04.png"), width = 14, height = 8, device = "png", plot=plot_mutations_04)
+
+
+
+
+
+
+#UPN05
+accepted_mutations_UPN05 <- as.data.frame(accepted_mutations_UPN05)
+df <- filter(accepted_mutations_UPN04, seg_assignment == 1)
+hist_data_extra <- df %>% 
+  ggplot(mapping = aes(x=(NV/DP))) +
+  geom_histogram(binwidth=0.01, , fill="blue", alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1.5) +
+  ylim(0, 5) +
+  ggtitle("UPN05 extra", data_lsh["UPN05_LSH"]$UPN05_LSH$segment.REL[1])
+
+
+df <- filter(accepted_mutations_UPN05, seg_assignment == 2)
+hist_data_LSH <- df %>% 
+  ggplot(mapping = aes(x=(NV/DP), fill=timing_classification)) +
+  geom_histogram(binwidth=0.01, , fill="blue", alpha = 0.5, position = "identity") +
+  theme(legend.position = 'top') +
+  xlim(0, 1.5) +
+  ylim(0, 5) +
+  ggtitle("UPN05 LSH", data_lsh["UPN05"]$UPN05$segment.REL[1])
+
+
+plot_mutations_05 <- (hist_data_extra + hist_data_LSH) + 
+  plot_layout(widths = c(6), heights = c(10)) +
+  plot_annotation(
+    title = 'Accepted mutations after inference on UPN05 LSH and UPN05 extra CN event ',
+    subtitle = " ", #Extra event is on chr
+    caption = "" #caption
+  ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
+plot_mutations_05
+
+ggsave(paste0("./plots/accepted_mutations_UPN05.png"), width = 14, height = 8, device = "png", plot=plot_mutations_05)
+
+
+
+
 
 
 
@@ -87,53 +188,4 @@ p_2 <- plotting(res_2,input_data_2,2)
 ggsave(paste0("./plots/plot_inference",names[1],"_2.png"), width = 12, height = 16, device = "png", plot=p_2)
 
 
-
-
-
-
-
-accepted_mutations_04 <- readRDS("./results/accepted_mutations_04.rds")
-accepted_mutations_05 <- readRDS("./results/accepted_mutations_05.rds")
-
-
-hist(accepted_mutations_04$NV/accepted_mutations_04$DP, breaks = 15)
-hist(accepted_mutations_05$NV/accepted_mutations_05$DP, breaks = 20)
-
-
-hist_data_extra <- as.data.frame(data["UPN04"]$UPN04) %>% 
-  ggplot(mapping = aes(x=(NV.REL/DP.REL),  fill = timing_classification)) +
-  scale_color_manual(values = c("black"))+
-  scale_fill_manual(values = c("red4","firebrick1"))+
-  geom_histogram(binwidth=0.01, alpha = 0.5, position = "identity") +
-  theme(legend.position = 'top') +
-  xlim(0, 1) +
-  ggtitle( "UPN04", data["UPN04"]$UPN04$segment.REL)
-
-
-hist_data_LSH <- as.data.frame(data["UPN04_LSH"]$UPN04_LSH) %>% 
-  ggplot(mapping = aes(x=(NV.REL/DP.REL), fill=timing_classification)) +
-  scale_color_manual(values = c("black"))+
-  scale_fill_manual(values = c("mediumblue","deepskyblue"))+
-  geom_histogram(binwidth=0.01, alpha = 0.5, position = "identity") +
-  theme(legend.position = 'top') +
-  xlim(0, 1) +
-  ggtitle("UPN04_LSH", data["UPN04_LSH"]$UPN04$segment.REL)
-
-
-p_istogram <- fit_extra_alpha_beta$inference_results %>% filter(segment_name == "UPN04" | segment_name == "UPN04_LSH") %>%
-  ggplot(mapping = aes(x=tau, fill=segment_name)) +
-  scale_fill_manual(values = c("mediumblue","red4"))+
-  geom_histogram(binwidth=0.02, alpha = 0.5, position = "identity") +
-  theme(legend.position = 'top') +
-  xlim(0, 1) 
-
-
-plot_inference_04 <- (p_istogram + (hist_data_extra / hist_data_LSH)) + 
-  plot_layout(widths = c(6), heights = c(10)) +
-  plot_annotation(
-    title = 'UPN04 LSH and extra event ',
-    subtitle = "Extra event is on chr ",
-    caption = "caption"
-  ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
-plot_inference_04
-
+#########################################################################################################à
