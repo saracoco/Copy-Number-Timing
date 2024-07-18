@@ -206,7 +206,7 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
     
   }
 
-   loo_plot <-  plot(model_selection_tibble$K, model_selection_tibble$LOO)
+   loo_plot <- ggplot(model_selection_tibble, aes(x=K, y=LOO)) + geom_point()
    ggsave(paste0("./plots/plot_loo_",all_sim$j[1],".png"), width = 5, height = 4, device = "png", plot=loo_plot)
    
   

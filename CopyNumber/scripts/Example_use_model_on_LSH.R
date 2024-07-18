@@ -29,10 +29,11 @@ UPN05_alpha_beta_NV = UPN05_alpha_beta %>% filter(timing_classification %in% c("
 
 data_lsh <- list(UPN04 = UPN04_extra_NV, UPN05 = UPN05_extra_NV, UPN04_LSH = UPN04_alpha_beta_NV, UPN05_LSH = UPN05_alpha_beta_NV)
 #names <- c("UPN04","UPN04_LSH", "UPN05", "UPN05_LSH")
-#names <- c("UPN04","UPN04_LSH")
-names <- c("UPN05", "UPN05_LSH")
+names <- c("UPN04","UPN04_LSH")
+#names <- c("UPN05", "UPN05_LSH")
 
 
+setwd("E:/scratch/CDS_ORFEO/Timing_CDS/initialization")
 
 
 data <- dplyr::tibble()
@@ -47,7 +48,8 @@ for(i in 1:length(names)){
                         NV = NV.REL) %>%
                   mutate(j = paste0(names[i]),
                         segment_id = i,
-                        karyo = as.character(karyo))
+                        karyo = as.character(karyo),
+                        karyotype = karyo)
   
   karyo <- data_single$karyo[1]
   
@@ -62,9 +64,9 @@ results <- fit_model_selection_best_K(data, karyo=karyo_all, purity=0.98, INIT=F
 
 results$model_selection_tibble
 
-# p <- plotting(results$res_best_K,results$input_data,results$best_K)
-# ggsave(paste0("./plots/plot_best_K_",names[1],".png"), width = 12, height = 16, device = "png", plot=p)
-# 
+p <- plotting(results$res_best_K,results$input_data,results$best_K)
+ggsave(paste0("./plots/plot_best_K_",names[1],".png"), width = 12, height = 16, device = "png", plot=p)
+
 
 
 
