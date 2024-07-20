@@ -1,6 +1,7 @@
 // reparametrization with dirichlet alpha being mean value of w and nuber of observations of the prior
 data {
   // input the karyotyoe to specify the formula for theta
+  //
   int S; // number of segments
   int K; // clocks
   int N; // total number of mutations
@@ -20,8 +21,7 @@ parameters {
   real<lower=0> kappa;
 }
 
-
-transformed parameters{
+p
 
   array[S,K,2] real<lower=0,upper=1> theta; //binomial mixing proportions // array[S,K] simplex[2] theta;
 
