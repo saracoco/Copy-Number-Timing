@@ -141,11 +141,11 @@ get_init = function(data, K, phi=c(), kappa=5){
 #' @examples
 #' fit_model_selection()
 
-fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=10, INIT=TRUE){
+fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=10, INIT=TRUE, simulation_params = simulation_params){
 
   
   if (INIT==TRUE){
-    tau_single_inference <- fit_single_segments(all_sim, purity=1)
+    tau_single_inference <- fit_single_segments(all_sim, purity=purity)
   }
 
 
@@ -261,7 +261,7 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
 library(cmdstanr)
 
 fit_variational <- function(input_data, max_attempts = 5, initialization = NULL, INIT = TRUE, initial_iter = 10000, grad_samples = 1, elbo_samples = 100) {
-  model <- cmdstanr::cmdstan_model("models/timing_mixed_simple.stan")
+  model <- cmdstanr::cmdstan_model("../models/timing_mixed_simple.stan")
   attempt <- 0
   fit_successful <- FALSE
   res <- NULL
@@ -417,7 +417,7 @@ prepare_input_data = function(all_sim, karyo, K, purity){
     DP = DP[accepted_idx]
   )
   
-  saveRDS(accepted_mutations, paste0("results/accepted_mutations.rds"))
+  #saveRDS(accepted_mutations, paste0("results/accepted_mutations.rds"))
 
   return(input_data)
 } 

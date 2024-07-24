@@ -21,7 +21,7 @@ parameters {
   real<lower=0> kappa;
 }
 
-p
+transformed parameters{
 
   array[S,K,2] real<lower=0,upper=1> theta; //binomial mixing proportions // array[S,K] simplex[2] theta;
 

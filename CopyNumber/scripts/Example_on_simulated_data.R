@@ -7,7 +7,7 @@ library(cmdstanr)
 library(factoextra)
 library(ppclust)
 
-setwd("C:/Users/sarac/CDS/CopyNumber")
+setwd("C:/Users/sarac/CDS_git/Copy-Number-Timing/CopyNumber/")
 source("./CNTiming/R/simulate_functions.R")
 source("./CNTiming/R/fitting_functions.R")
 source("./CNTiming/R/plotting_functions.R")
