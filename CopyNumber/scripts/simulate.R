@@ -3,11 +3,13 @@ library(loo)
 library(bayesplot)
 library(cmdstanr)
 library(factoextra)
-library(ppclust)
 library(dplyr)
 
 
-setwd("C:/Users/sarac/CDS_git/Copy-Number-Timing/CopyNumber/")
+#setwd("C:/Users/sarac/CDS_git/Copy-Number-Timing/CopyNumber/")
+#orfeo
+setwd("/orfeo/cephfs/scratch/cdslab/scocomello/Copy-Number-Timing/CopyNumber")
+
 original_dir <- getwd()
 # source("./prova_simulation_functions/simulate_functions.R")
 # source("./prova_simulation_functions/fitting_functions.R")
@@ -18,14 +20,23 @@ source("./CNTiming/R/simulate_functions.R")
 source("./CNTiming/R/fitting_functions.R")
 source("./CNTiming/R/plotting_functions.R")
 
-
+#source("./prova_simulation_functions/simulate_functions.R")
+#source("./prova_simulation_functions/fitting_functions.R")
+#source("./prova_simulation_functions/plotting_functions.R")
 
 S = 6
 K = 3
 INIT = FALSE
 epsilon = 0.15
+n_simulations = 20
+purity = 0.99
 
-for(i in 1:3){
+vector_karyo <- c("2:0", "2:1", "2:2")
+weights_karyo <- c(0.33, 0.33, 0.33)
+
+
+
+for(i in 1:n_simulations){
   # Create a unique directory for each iteration
   iter_dir <- paste0("./simulation_iteration_", i)
   dir.create(iter_dir)
@@ -41,20 +52,18 @@ for(i in 1:3){
   for (j in 1:K){
     vector_tau[j] = runif(1, 0)
     if (j != 1){
-      while ((vector_tau[j-1] - vector_tau[j]) < 0.10){
+        vector_tau[j] = runif(1, 0)
+      while (abs(vector_tau[j-1] - vector_tau[j]) < 0.20){
         vector_tau[j] = runif(1, 0)
       }
     }
   }
-  
-  vector_karyo <- c("2:0", "2:1", "2:2")
   weights_tau <- rep(1/K, K)
-  weights_karyo <- c(0.33, 0.33, 0.33)
-  purity = 0.99
   
   data <- get_taus_karyo(number_events, vector_tau, vector_karyo, weights_tau, weights_karyo)
   all_sim = get_simulation(data$taus, data$karyo, purity)
   data_sim <- all_sim
+  #add statistics on number of mutations from the simulation
   
   plot_data <- data_sim %>%
     ggplot(mapping = aes(x = NV / DP, fill = as.factor(j))) +
@@ -63,15 +72,23 @@ for(i in 1:3){
   
   ggsave("./plots/original_data.png", plot = plot_data, width = 12, height = 10, device = "png")
   
-  simulation_params <- tibble(
+  simulation_params <- list(
     vector_tau = vector_tau,
     vector_karyo = vector_karyo,
     weights_tau = weights_tau,
     weights_karyo = weights_karyo,
+    taus = data$taus,
+    karyo = data$karyo,
     purity = purity
   )
   
   results <- fit_model_selection_best_K(data_sim, data$karyo, purity, INIT = INIT, simulation_params = simulation_params)
+  
+  
+  
+  
+  
+  
   
   model_selection <- results$model_selection_tibble
   saveRDS(model_selection, "model_selection.rds")
