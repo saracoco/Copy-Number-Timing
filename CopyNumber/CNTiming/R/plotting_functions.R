@@ -60,7 +60,7 @@ plotting <- function(res, input_data, all_sim, K){
   
    
   
-  
+  accepted_mutations <- readRDS("results/accepted_mutations.rds")
   
   Subtitle <- vector("list", length(unique(accepted_mutations$segment_id)))
 
@@ -74,8 +74,7 @@ plotting <- function(res, input_data, all_sim, K){
   
   
   
-  accepted_mutations <- readRDS("results/accepted_mutations.rds")
-  plot_filtered_data <- accepted_mutations %>%
+    plot_filtered_data <- accepted_mutations %>%
     ggplot(mapping = aes(x = NV / DP, fill = as.factor(segment_id))) +
     geom_histogram(alpha = .5, position = "identity") +
     labs(x = "VAF")+
