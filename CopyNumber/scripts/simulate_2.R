@@ -16,11 +16,11 @@ source("./CNTiming/R/simulate_functions.R")
 source("./CNTiming/R/fitting_functions.R")
 source("./CNTiming/R/plotting_functions.R")
 
-number_events = 6
-number_clocks = 3
 
+S = 10
+K = 3
 INIT = FALSE
-epsilon = 0.20
+epsilon = 0.15
 n_simulations = 20
 purity = 0.99
 
@@ -31,25 +31,27 @@ weights_karyo <- c(0.33, 0.33, 0.33)
 
 for(i in 1:n_simulations){
   # Create a unique directory for each iteration
-  iter_dir <- paste0("./simulation_iteration_", i)
+  iter_dir <- paste0("./simulation_2_iteration_", i)
   dir.create(iter_dir)
   setwd(iter_dir)
   dir.create(paste0("./plots"), showWarnings = TRUE)
   dir.create(paste0("./results"), showWarnings = FALSE)
   
   
-
-  vector_tau = rep(0, number_clocks)
+  number_events = S
+  number_clusters = K
+  vector_tau = c()
   
-  for (j in 1:number_clocks){
+  for (j in 1:K){
     vector_tau[j] = runif(1, 0)
     if (j != 1){
-      while (all ( abs(vector_tau[1:j-1] - vector_tau[j]) < epsilon  )   ){
+      vector_tau[j] = runif(1, 0)
+      while (abs(vector_tau[j-1] - vector_tau[j]) < epsilon){
         vector_tau[j] = runif(1, 0)
       }
     }
   }
-  weights_tau <- rep(1/number_clocks, number_clocks)
+  weights_tau <- rep(1/K, K)
   
   data <- get_taus_karyo(number_events, vector_tau, vector_karyo, weights_tau, weights_karyo)
   all_sim = get_simulation(data$taus, data$karyo, purity)
@@ -70,9 +72,7 @@ for(i in 1:n_simulations){
     weights_karyo = weights_karyo,
     taus = data$taus,
     karyo = data$karyo,
-    purity = purity,
-    number_events = number_events,
-    number_clocks = number_clocks
+    purity = purity
   )
   
   
@@ -111,7 +111,7 @@ for(i in 1:n_simulations){
                                    "Best K Point" = "red",
                                    "Minimum Point" = "green"))
   
-
+  
   loo_plot <- ggplot(data = model_selection, aes(x = K, y = LOO)) + 
     geom_line(aes(colour = "LOO Line")) + 
     geom_point(aes(colour = "LOO Point")) +
@@ -150,11 +150,11 @@ for(i in 1:n_simulations){
   
   
   model_selection_plot <- (bic_plot | aic_plot) / (loo_plot|log_lik_plot) +
-  plot_annotation(
-    title = "Model selection graphs: score vs number of clusters" ,
-    subtitle = paste0 ("Correspondence between number of clusters and number of parameters:  \n", Subtitle),
-    caption = "caption"
-  ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
+    plot_annotation(
+      title = "Model selection graphs: score vs number of clusters" ,
+      subtitle = paste0 ("Correspondence between number of clusters and number of parameters:  \n", Subtitle),
+      caption = "caption"
+    ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
   
   
   
