@@ -11,7 +11,7 @@
 #' plotting()
 
 
-plotting <- function(res, input_data, all_sim, K){
+plotting <- function(res, input_data, all_sim, K, simulation_params){
 
   draws <- res$draws(format = "matrix")
 
@@ -156,11 +156,11 @@ plotting <- function(res, input_data, all_sim, K){
     
 
     final_plot <- (tau_segments_plot|karyo_segments_plot ) / plot_filtered_data /  (areas_tau | intervals) / (ppc | intervals_compare) / (mean_compare|max_compare|min_compare|median_compare) +
-      plot_layout(widths = c(8, 8, 6, 8, 8), heights = c(15, 8, 8, 15, 8)) +
+      plot_layout(widths = c(8, 8, 6, 8, 8), heights = c(8, 15, 15, 8, 8)) +
       plot_annotation(
-        title = paste0("Simulation with ", , ),
-        subtitle = "Subtitle",
-        caption = "caption"
+        title = paste0("Simulation with ", simulation_params$number_clocks," clocks, ", simulation_params$number_events, " segments, epsilon = ", simulation_params$epsilon, " purity = ", simulation_params$purity ),
+        subtitle = " ",
+        caption = " "
       ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
     
     

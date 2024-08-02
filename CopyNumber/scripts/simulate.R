@@ -16,7 +16,7 @@ source("./CNTiming/R/simulate_functions.R")
 source("./CNTiming/R/fitting_functions.R")
 source("./CNTiming/R/plotting_functions.R")
 
-number_events = 6
+number_events = 10
 number_clocks = 3
 
 INIT = FALSE
@@ -72,7 +72,8 @@ for(i in 1:n_simulations){
     karyo = data$karyo,
     purity = purity,
     number_events = number_events,
-    number_clocks = number_clocks
+    number_clocks = number_clocks,
+    epsilon = epsilon
   )
   
   

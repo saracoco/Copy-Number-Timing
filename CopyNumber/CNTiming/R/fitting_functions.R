@@ -212,7 +212,7 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
     saveRDS(res, paste0("results/res",K,"_",all_sim$j[1],".rds"))
     saveRDS(input_data, paste0("results/input_data_",all_sim$j[1],"_",K,".rds"))
     
-    p <- plotting(res,input_data, all_sim ,K)
+    p <- plotting(res,input_data, all_sim ,K, simulation_params)
     ggsave(paste0("./plots/plot_inference_",all_sim$j[1],"_",K,".png"), width = 12, height = 16, device = "png", plot=p)
     
   }
@@ -228,7 +228,7 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
      res <- fit_variational(input_data, max_attempts=max_attempts, INIT=FALSE)
    }
    
-   p_best_K <- plotting(res,input_data, all_sim, best_K)
+   p_best_K <- plotting(res,input_data, all_sim, best_K, simulation_params)
    ggsave(paste0("./plots/plot_inference_",all_sim$j[1],"_",best_K,".png"), width = 12, height = 16, device = "png", plot=p_best_K)
    
   return(list(all_sim = all_sim, model_selection_tibble = model_selection_tibble, res_best_K=res, best_K=best_K, input_data=input_data
