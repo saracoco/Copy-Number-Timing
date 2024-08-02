@@ -152,7 +152,18 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
   #MODEL SELECTION
   model_selection_tibble <- dplyr::tibble()
 
-  for (K in 1:length(karyo)) {
+  
+  #Regola empirica: In generale, si può considerare come massimo plausibile un numero di cluster pari a 
+  # sqrt(n/2), dove n è il numero di punti dati.
+  
+
+  if (length(karyo) <= 10){
+    k_max = length(karyo)/2
+  } else { k_max = sqrt(length(karyo)/2)
+    
+  }
+  
+  for (K in 1:k_max) {
     input_data <- prepare_input_data(all_sim, karyo, K, purity)
 
     if (INIT==TRUE){
@@ -205,10 +216,6 @@ fit_model_selection_best_K = function(all_sim, karyo, purity=0.95, max_attempts=
     ggsave(paste0("./plots/plot_inference_",all_sim$j[1],"_",K,".png"), width = 12, height = 16, device = "png", plot=p)
     
   }
-
-   loo_plot <- ggplot(model_selection_tibble, aes(x=K, y=LOO)) + geom_point()
-   ggsave(paste0("./plots/plot_loo_",all_sim$j[1],".png"), width = 5, height = 4, device = "png", plot=loo_plot)
-   
   
    best_K <- model_selection_tibble %>% dplyr::filter(LOO == min(LOO)) %>% pull(K)
    input_data <- prepare_input_data(all_sim, karyo, best_K, purity)

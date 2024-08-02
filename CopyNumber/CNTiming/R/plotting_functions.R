@@ -23,17 +23,21 @@ plotting <- function(res, input_data, all_sim, K){
     draws,
     pars = names,
     prob = 0.8, # 80% intervals
-    prob_outer = 0.99, # 99%
+    prob_outer = 0.95, # 99%
     point_est = "mean"
   )+
     labs(
       title = "Approximate Posterior distributions",
-      subtitle = "with mean and 80% intervals"
+      subtitle = "with mean and 80% and 95% intervals"
     )+
     xlim(0, 1)
 
   color_scheme_set("blue")
-  intervals <- mcmc_intervals(draws, regex_pars = c("w"))
+  intervals <- mcmc_intervals(draws, regex_pars = c("w"), point_est = "mean", prob = 0.8, prob_outer = 0.95)+
+    labs(
+      title = "Posterior distributions",
+      subtitle = "with mean and 80% and 95% intervals"
+    )
 
 
   #posterior predictive check
@@ -43,12 +47,19 @@ plotting <- function(res, input_data, all_sim, K){
   #distribution of replicated data vs real data
   ppc <- ppc_dens_overlay(
     y = input_data$NV,
-    yrep = y_rep)
+    yrep = y_rep) +
+    labs(
+      title = "Posterior Predictive checks with 10000 iterations",
+      subtitle = "Density distribution"
+    )
   #empirical cumulative distribution
   ecdf_compare <-ppc_ecdf_overlay(y,y_rep)
 
   #predictive intervals vs observed values
-  intervals_compare <- ppc_intervals(y,y_rep)
+  intervals_compare <- ppc_intervals(y,y_rep) +
+    labs(
+      subtitle = " Observed data vs Predicted values for each segment",
+    )
 
   #Compare statistics
   #compute the estimated Bayesian p-value
@@ -73,13 +84,13 @@ plotting <- function(res, input_data, all_sim, K){
   Subtitle <- paste(Subtitle, collapse = "\n")
   
   
-  
+  accepted_mutations %>% mutate (tau = round(tau, 2))
     plot_filtered_data <- accepted_mutations %>%
     ggplot(mapping = aes(x = NV / DP, fill = as.factor(segment_id))) +
     geom_histogram(alpha = .5, position = "identity") +
     labs(x = "VAF")+
     labs(
-      title = "Filtered data",
+      title = "Histogram for the VAF spectrum, per segment, resulting from the simulation (only the data used in the inference after the filtering step are plotted here)",
       subtitle = paste0(Subtitle)
     )+
     facet_wrap(vars(karyotype, tau, segment_id))
@@ -91,7 +102,7 @@ plotting <- function(res, input_data, all_sim, K){
   
   
   hist_data <- all_sim %>%
-    count(tau = round(tau, 3)) %>%
+    count(tau = round(tau, 2)) %>%
     filter(n > 0)
 
   taus <- all_sim %>%
@@ -143,17 +154,17 @@ plotting <- function(res, input_data, all_sim, K){
     theme_minimal()
   
     
-    
-    
 
-    final_plot <- (areas_tau | intervals) / (ppc | intervals_compare) / (mean_compare|max_compare|min_compare|median_compare) / plot_filtered_data / (tau_segments_plot|karyo_segments_plot ) +
-        plot_layout(widths = c(6, 8, 8, 8, 8), heights = c(15, 8, 8, 15, 8)) +
+    final_plot <- (tau_segments_plot|karyo_segments_plot ) / plot_filtered_data /  (areas_tau | intervals) / (ppc | intervals_compare) / (mean_compare|max_compare|min_compare|median_compare) +
+      plot_layout(widths = c(8, 8, 6, 8, 8), heights = c(15, 8, 8, 15, 8)) +
       plot_annotation(
-        title = "Title" ,
+        title = paste0("Simulation with ", , ),
         subtitle = "Subtitle",
         caption = "caption"
       ) & theme(text = element_text(size = 8), plot.title = element_text(size = 10), plot.subtitle = element_text(size = 8), axis.text = element_text(size = 8), plot.caption = element_text(size = 5))
-
+    
+    
+    
     # ggsave("./plots/plots_inference.pdf", plot = final_plot, width = 12, height = 24)
     # ggsave("./plots/plots_inference.png", width = 12, height = 24, device = "png")
     #
